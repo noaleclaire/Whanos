@@ -1,0 +1,11 @@
+FROM node:latest
+SHELL [ "/bin/bash", "-c" ]
+WORKDIR /app
+RUN npm install befunge93
+COPY . .
+RUN echo -e "const Befunge = require('befunge93');\n\
+    let befunge = new Befunge();\n\
+    const fs = require('fs');\n\
+    let text = fs.readFileSync(process.argv[2].toString(), {encoding:'utf8'});\n\
+    befunge.run(text);" > app.js
+CMD [ "node", "app/main.bf" ]

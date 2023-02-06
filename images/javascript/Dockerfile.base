@@ -1,0 +1,7 @@
+FROM node:latest
+SHELL [ "/bin/bash", "-c" ]
+ONBUILD WORKDIR /app
+ONBUILD COPY package*.json ./
+ONBUILD RUN npm install
+ONBUILD COPY . .
+ONBUILD CMD [ "node", "." ]
