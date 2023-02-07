@@ -8,4 +8,4 @@ ONBUILD RUN echo -e "const Befunge = require('befunge93');\n\
     const fs = require('fs');\n\
     let text = fs.readFileSync(process.argv[2].toString(), {encoding:'utf8'});\n\
     befunge.run(text);" > app.js
-ONBUILD CMD [ "node", "app/main.bf" ]
+ONBUILD CMD [ "node", "app.js", "app/main.bf" ]
