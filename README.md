@@ -5,9 +5,9 @@
 <br />
 <p align="center">
   <a href="#propos">
-    <img src="nom-de-votre-image.png" alt="Logo" width="80" height="80">
+    <img src="https://pbs.twimg.com/profile_images/1372956118113263619/L9-bkahs_400x400.jpg" alt="Logo" width="80" height="80">
   </a>
-  <h3 align="center">Nom de votre projet</h3>
+  <h3 align="center">WHANOS</h3>
   <p align="center">
     Ce projet est le projet de fin d'année en DevOps
     <br />
@@ -24,8 +24,6 @@
 </p>
 
 ## Propos
-
-![image](https://user-images.githubusercontent.com/72024794/217528059-e876babf-3f57-4265-8d8a-794d1e7a4d27.png)
 
 Le projet à pour objectif de [...]
 
