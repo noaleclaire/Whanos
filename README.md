@@ -11,7 +11,9 @@
   <p align="center">
     Ce projet est le projet de fin d'année en DevOps
     <br />
-    <a href="#"><strong>fonctionnalités »</strong></a>
+    <a href="#"><strong>fonctionnalités</strong></a>
+    - 1)
+    - 2)
     <br />
     <br />
     <a href="#utilisation">Utilisation</a>
