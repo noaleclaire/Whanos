@@ -9,32 +9,33 @@
   </a>
   <h3 align="center">Nom de votre projet</h3>
   <p align="center">
-    Une courte description de votre projet
+    Ce projet est le projet de fin d'année en DevOps
     <br />
-    <a href="#"><strong>Explorer les fonctionnalités »</strong></a>
+    <a href="#"><strong>fonctionnalités »</strong></a>
     <br />
     <br />
-    <a href="#installation">Installation</a>
-    ·
     <a href="#utilisation">Utilisation</a>
     ·
     <a href="#contribuer">Contribuer</a>
     ·
     <a href="#licence">Licence</a>
+    Distrinué sous license MIT
   </p>
 </p>
 
 ## Propos
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+![image](https://user-images.githubusercontent.com/72024794/217528059-e876babf-3f57-4265-8d8a-794d1e7a4d27.png)
 
-Une description détaillée de votre projet, pourquoi vous l'avez créé, ce qu'il peut faire, des captures d'écran, des vidéos, etc.
+Le projet à pour objectif de [...]
 
 ### Built With
 
-* [Technologie 1](https://lien.vers/technologie1)
-* [Technologie 2](https://lien.vers/technologie2)
-* [Technologie 3](https://lien.vers/technologie3)
+* [Docker](https://www.docker.com)
+* [Jenkins](https://www.jenkins.io)
+* [Kubernetes](https://kubernetes.io/fr)
+* [Ansible](https://www.ansible.com)
+* [Azure](https://azure.microsoft.com/fr-fr)
 
 ## Installation
 
@@ -50,4 +51,4 @@ Des instructions sur la façon de contribuer au projet, comment faire des pull r
 
 ## Licence
 
-Distribué sous la licence MIT. Voir `LICENSE` pour plus d'informations.
+Distribué sous la licence MIT.
