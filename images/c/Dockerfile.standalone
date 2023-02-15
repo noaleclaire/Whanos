@@ -3,5 +3,5 @@ SHELL [ "/bin/bash", "-c" ]
 WORKDIR /app
 COPY . .
 RUN make
-RUN rm Makefile && rm app/*.c && rm app/*.o
+RUN rm Makefile && rm app/*.c
 CMD [ "./compiled-app" ]

@@ -4,5 +4,5 @@ WORKDIR /app
 COPY app/. .
 RUN mvn -B -f pom.xml -s /usr/share/maven/ref/settings-docker.xml dependency:resolve
 RUN mvn package
-RUN mv target/app app.jar && rm -r target/ && rm pom.xml
+RUN mv target/app.jar app.jar && rm -r target/ && rm pom.xml && rm -r src/
 CMD [ "java", "-jar", "app.jar" ]

@@ -4,5 +4,5 @@ ONBUILD WORKDIR /app
 ONBUILD COPY app/. .
 ONBUILD RUN mvn -B -f pom.xml -s /usr/share/maven/ref/settings-docker.xml dependency:resolve
 ONBUILD RUN mvn package
-ONBUILD RUN mv target/app app.jar && rm -r target/ && rm pom.xml
+ONBUILD RUN mv target/app.jar app.jar && rm -r target/ && rm pom.xml && rm -r src/
 ONBUILD CMD [ "java", "-jar", "app.jar" ]

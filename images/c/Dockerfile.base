@@ -3,5 +3,5 @@ SHELL [ "/bin/bash", "-c" ]
 ONBUILD WORKDIR /app
 ONBUILD COPY . .
 ONBUILD RUN make
-ONBUILD RUN rm Makefile && rm app/*.c && rm app/*.o
+ONBUILD RUN rm Makefile && rm app/*.c
 ONBUILD CMD [ "./compiled-app" ]
