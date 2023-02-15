@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  jenkins:
+    build: .
+    image: jenkins:whanos
+    restart: unless-stopped
+    env_file:
+      - env_variable.txt
+    ports:
+      - 8080:8080
+    container_name: jenkins
