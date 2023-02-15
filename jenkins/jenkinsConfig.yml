@@ -18,9 +18,11 @@ jenkins:
             description: "Whanos Admin"
             permissions:
               - "Overall/Administer"
+            assignments:
+              - "admin"
 
 unclassified:
   location:
     url: http://jenkins:8080/
 jobs:
-  - file: "/var/jenkins_home/job_dsl.groovy"
+  - file: "/jenkins/job_dsl.groovy"
