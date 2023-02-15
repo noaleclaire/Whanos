@@ -1,6 +1,7 @@
-FROM gcc:latest
+FROM gcc:11.2
 SHELL [ "/bin/bash", "-c" ]
 WORKDIR /app
 COPY . .
 RUN make
+RUN rm Makefile && rm app/*.c && rm app/*.o
 CMD [ "./compiled-app" ]
