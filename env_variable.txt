@@ -1,2 +1,0 @@
-CASC_JENKINS_CONFIG=/var/jenkins_home/whanos.yml
-USER_ADMIN_PASSWORD="sonahw"
