@@ -1,7 +1,6 @@
 FROM node:14.17.5
 SHELL [ "/bin/bash", "-c" ]
 ONBUILD WORKDIR /app
-ONBUILD COPY package*.json ./
-ONBUILD RUN npm install
 ONBUILD COPY . .
+ONBUILD RUN npm install
 ONBUILD CMD [ "node", "." ]

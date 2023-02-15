@@ -1,7 +1,7 @@
-FROM python:latest
+FROM python:3.10
 SHELL [ "/bin/bash", "-c" ]
 ONBUILD WORKDIR /app
 ONBUILD COPY requirements.txt .
 ONBUILD RUN pip install --no-cache-dir -r requirements.txt
-ONBUILD COPY . .
+ONBUILD COPY app/. .
 ONBUILD CMD [ "python", "-m", "app" ]
