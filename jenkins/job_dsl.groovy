@@ -41,6 +41,7 @@ freeStyleJob('/Whanos base images/whanos-befunge') {
 }
 
 freeStyleJob('/Whanos base images/Build all base images') {
+    description('build all base images so that it is available for the Jenkins instance host to use.')
     agent any
     stages {
         stage('info') {
