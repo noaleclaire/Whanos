@@ -1,12 +1,8 @@
-FROM maven:latest AS build
+FROM maven:3.8.7-eclipse-temurin-17
 SHELL [ "/bin/bash", "-c" ]
 ONBUILD WORKDIR /app
 ONBUILD COPY app/. .
-ONBUILD RUN mvn dependency:go-offline -B
+ONBUILD RUN mvn -B -f pom.xml -s /usr/share/maven/ref/settings-docker.xml dependency:resolve
 ONBUILD RUN mvn package
-
-FROM eclipse-temurin:latest
-SHELL [ "/bin/bash", "-c" ]
-ONBUILD WORKDIR /app
-ONBUILD COPY --from=build /app/target/app.jar /app/app.jar
-ONBUILD CMD [ "java", "-jar", "/app.jar" ]
+ONBUILD RUN mv target/app app.jar && rm -r target/ && rm pom.xml
+ONBUILD CMD [ "java", "-jar", "app.jar" ]
