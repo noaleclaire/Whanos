@@ -1,11 +1,11 @@
-FROM node:latest
+FROM node:14.17.5
 SHELL [ "/bin/bash", "-c" ]
 ONBUILD WORKDIR /app
 ONBUILD RUN npm install befunge93
-ONBUILD COPY . .
+ONBUILD COPY app/. .
 ONBUILD RUN echo -e "const Befunge = require('befunge93');\n\
     let befunge = new Befunge();\n\
     const fs = require('fs');\n\
     let text = fs.readFileSync(process.argv[2].toString(), {encoding:'utf8'});\n\
     befunge.run(text);" > app.js
-ONBUILD CMD [ "node", "app.js", "app/main.bf" ]
+ONBUILD CMD [ "node", "app.js", "main.bf" ]
