@@ -10,3 +10,13 @@ services:
     ports:
       - 8080:8080
     container_name: jenkins
+    depends_on:
+      - dind
+  dind:
+    image: docker:dind
+    restart: unless-stopped
+    privileged: true
+    ports:
+      - 2375:2375
+    environment:
+      - DOCKER_TLS_CERTDIR=
