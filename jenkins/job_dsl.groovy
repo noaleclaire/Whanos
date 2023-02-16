@@ -64,14 +64,14 @@ freeStyleJob('/Whanos base images/Build all base images') {
 freeStyleJob('link-project') {
     description('links the specified project in the parameters to the Whanos infrastructure')
     parameters {
-        stringParam("GITHUB_NAME", "", "Git repository url links to the Whanos infrastructure")
+        stringParam("GITHUB_NAME", "", "Git repository url links to the Whanos infrastructure (owner/repo_name)")
         stringParam("JOB_NAME", "", "Name of the job to be created")
     }
     steps {
         dsl {
 			text('''freeStyleJob("Projects/$JOB_NAME") {
 					scm {
-						github($GITHUB_NAME)
+						github("$GITHUB_NAME")
 					}
 					triggers {
 						scm("* * * * *")
@@ -80,7 +80,7 @@ freeStyleJob('link-project') {
 						preBuildCleanup()
 					}
 					steps {
-						shell("/jenkins/check_language.sh")
+						shell("bash /jenkins/check_language.sh")
 					}
 				}'''.stripIndent())
 		}

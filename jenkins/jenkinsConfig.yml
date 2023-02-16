@@ -21,6 +21,10 @@ jenkins:
             assignments:
               - "admin"
 
+security:
+  globalJobDslSecurityConfiguration:
+    useScriptSecurity: false
+
 unclassified:
   location:
     url: http://jenkins:8080/
