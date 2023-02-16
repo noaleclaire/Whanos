@@ -80,7 +80,7 @@ freeStyleJob('link-project') {
 						preBuildCleanup()
 					}
 					steps {
-						shell("/jenkins/deploy.sh \\"$DISPLAY_NAME\\"")
+						shell("/jenkins/check_language.sh")
 					}
 				}'''.stripIndent())
 		}
