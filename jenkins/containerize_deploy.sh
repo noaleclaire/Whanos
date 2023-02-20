@@ -2,11 +2,12 @@
 
 function containerize() {
     LANGUAGE="$1"
+    az login --service-principal -u $APP_ID -p $PASSWORD --tenant $TENANT_ID
     if test -f "Dockerfile"
     then
-        docker build -t "registry/whanos-$LANGUAGE" .
+        az acr build --image "whanos-$LANGUAGE" --file Dockerfile .
     else
-        docker build -t "registry/whanos-$LANGUAGE" -f /images/$LANGUAGE/Dockerfile.standalone .
+        az acr build --image "whanos-$LANGUAGE" --file /images/$LANGUAGE/Dockerfile.standalone .
     fi
 }
 
