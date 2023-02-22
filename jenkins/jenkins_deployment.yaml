@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins-instance
+spec:
+  # replicas: 2
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: jenkins-instance
+  template:
+    metadata:
+      labels:
+        app: jenkins-instance
+    spec:
+      containers:
+      - name: jenkins-instance-container
+        image: jenkins-whanos:latest
+        imagePullPolicy: IfNotPresent
+        envFrom:
+          - secretRef:
+              name: jenkins-secrets
+        resources:
+          limits:
+            memory: "4Gi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+          name: jenkins-port
+      - name: dind-container
+        image: docker:dind
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: DOCKER_TLS_CERTDIR
+          value: ""
+        resources:
+          limits:
+            memory: "500Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 2375
+          name: dind-port
+        securityContext:
+          privileged: true
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: jenkins-instance
+spec:
+  type: LoadBalancer
+  selector:
+    app: jenkins-instance
+  ports:
+  - port: 80
+    targetPort: jenkins-port
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: dind-jenkins-instance
+spec:
+  selector:
+    app: jenkins-instance
+  ports:
+  - port: 2375
+    targetPort: dind-port
