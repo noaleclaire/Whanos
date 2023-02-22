@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: jenkins-instance
 spec:
-  # replicas: 2
+  replicas: 1
   strategy:
     rollingUpdate:
       maxUnavailable: 0
@@ -17,27 +17,31 @@ spec:
     spec:
       containers:
       - name: jenkins-instance-container
-        image: jenkins-whanos:latest
-        imagePullPolicy: IfNotPresent
+        image: whanosregistry.azurecr.io/jenkins-whanos:latest
         envFrom:
           - secretRef:
               name: jenkins-secrets
         resources:
           limits:
-            memory: "4Gi"
+            memory: "7Gi"
+            cpu: "500m"
+          requests:
+            memory: "5Gi"
             cpu: "500m"
         ports:
         - containerPort: 8080
           name: jenkins-port
       - name: dind-container
         image: docker:dind
-        imagePullPolicy: IfNotPresent
         env:
         - name: DOCKER_TLS_CERTDIR
           value: ""
         resources:
           limits:
-            memory: "500Mi"
+            memory: "5Gi"
+            cpu: "500m"
+          requests:
+            memory: "3Gi"
             cpu: "500m"
         ports:
         - containerPort: 2375

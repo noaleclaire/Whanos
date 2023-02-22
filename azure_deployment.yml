@@ -18,13 +18,9 @@
     - name: Fill env.yaml for ansible-playbook
       shell: "sed -i \"1 i az_subscription_id: $(az account show --query id -o tsv)\\naz_app_id: $(grep -oP '(?<=\"appId\": \")[^\"]*' tmp.json)\\naz_password: $(grep -oP '(?<=\"password\": \")[^\"]*' tmp.json)\\naz_tenant_id: $(grep -oP '(?<=\"tenant\": \")[^\"]*' tmp.json)\" env.yaml"
     - name: Fill env_variables for jenkins
-      shell: "sed -i \"1 i USER_ADMIN_PASSWORD=\"$(grep -oP '(?<=jenkins_user_admin_password: ).*' env.yaml)\"\\nAZ_APP_ID=$(grep -oP '(?<=\"appId\": \")[^\"]*' tmp.json)\\nAZ_PASSWORD=$(grep -oP '(?<=\"password\": \")[^\"]*' tmp.json)\\nAZ_TENANT_ID=$(grep -oP '(?<=\"tenant\": \")[^\"]*' tmp.json)\" jenkins/env_variables.txt && rm tmp.json"
+      shell: "sed -i \"1 i USER_ADMIN_PASSWORD=\"$(grep -oP '(?<=jenkins_user_admin_password: ).*' env.yaml)\"\\nAZ_APP_ID=$(grep -oP '(?<=\"appId\": \")[^\"]*' tmp.json)\\nAZ_PASSWORD=$(grep -oP '(?<=\"password\": \")[^\"]*' tmp.json)\\nAZ_TENANT_ID=$(grep -oP '(?<=\"tenant\": \")[^\"]*' tmp.json)\\nAZ_RESOURCE_GROUP={{ az_resource_group }}\\nAZ_REGISTRY_NAME={{ az_registry_name }}\\nAZ_CLUSTER_NAME={{ az_cluster_name }}\" jenkins/env_variables.txt && rm tmp.json"
     - name: Log out from Azure
       shell: "az logout"
-
-
-    - name: Log into Azure with service principal
-      shell: "az login --service-principal -u {{ az_app_id }} -p {{ az_password }} --tenant {{ az_tenant_id }}"
 
 - name: Create Azure Container Registry
   hosts: localhost
@@ -33,22 +29,10 @@
     - name: Load ansible variables
       include_vars:
         file: env.yaml
+    - name: Log into Azure with service principal
+      shell: "az login --service-principal -u {{ az_app_id }} -p {{ az_password }} --tenant {{ az_tenant_id }}"
     - name: Creation of Azure Container Registry
       shell: "az acr create --resource-group {{ az_resource_group }} --name {{ az_registry_name }} --sku standard --location francecentral --admin-enabled true"
-
-      # azure.azcollection.azure_rm_containerregistry:
-      #   name: "{{ az_registry_name }}"
-      #   resource_group: "{{ az_resource_group }}"
-      #   location: "francecentral"
-      #   admin_user_enabled: true
-      #   sku: "standard"
-      #   tags:
-      #     environment: "dev"
-      #   subscription_id: "{{ az_subscription_id }}"
-      #   client_id: "{{ az_app_id }}"
-      #   secret: "{{ az_password }}"
-      #   tenant: "{{ az_tenant_id }}"
-      # register: acr
 
 - name: Create Azure Kubernetes Service
   hosts: localhost
@@ -58,49 +42,28 @@
       include_vars:
         file: env.yaml
     - name: Creation of Azure Kubernetes Service
-      shell: "az aks create --resource-group {{ az_resource_group }} --name {{ az_cluster_name }} --location francecentral --node-count 2 --node-vm-size Standard_B2s --dns-name-prefix whanos --service-principal {{ az_app_id }} --client-secret {{ az_password }} --tags \"env=Prod\""
-      # --attach-acr {{ az_registry_name }}
+      shell: "az aks create --resource-group {{ az_resource_group }} --name {{ az_cluster_name }} --location francecentral --node-count 2 --node-vm-size Standard_D2_v2 --dns-name-prefix whanos --service-principal {{ az_app_id }} --client-secret {{ az_password }} --attach-acr {{ az_registry_name }} --tags \"env=Prod\""
 
-    #   azure.azcollection.azure_rm_aks:
-    #     name: "{{ az_cluster_name }}"
-    #     resource_group: "{{ az_resource_group }}"
-    #     location: "francecentral"
-    #     dns_prefix: "whanos"
-    #     agent_pool_profiles:
-    #       - name: default
-    #         count: 2
-    #         vm_size: "Standard_B2s"
-    #     service_principal:
-    #       client_id: "{{ az_app_id }}"
-    #       client_secret: "{{ az_password }}"
-    #     tags:
-    #       environment: Dev
-    #     subscription_id: "{{ az_subscription_id }}"
-    #     client_id: "{{ az_app_id }}"
-    #     secret: "{{ az_password }}"
-    #     tenant: "{{ az_tenant_id }}"
-    #   register: aks
-    # - name: Attach Azure Registry to Azure Kubernetes Service
-    #   shell: "az aks update -n {{ az_cluster_name }} -g {{ az_resource_group }} --attach-acr {{ az_registry_name }}"
-
-# - name: Deploy Jenkins Instance
-#   hosts: localhost
-#   connection: local
-#   tasks:
-#     - name: Load ansible variables
-#       include_vars:
-#         file: env.yaml
-#     - name: Log into Azure
-#       shell: "az login --service-principal -u {{ az_app_id }} -p {{ az_password }} --tenant {{ az_tenant_id }}"
-#     - name: Push into Azure
-#       shell: "az acr build --image jenkins-whanos:latest --registry {{ az_registry_name }} --file jenkins/Dockerfile ."
-#     - name: Install kubectl interface
-#       shell: "az aks install-cli"
-#     - name: Get credentials WhanosK8S
-#       shell: "az aks get-credentials --resource-group {{ az_resource_group }} --name {{ az_cluster_name }}"
-#     - name: Generate jenkins secrets
-#       shell: "kubectl create secret generic jenkins-secrets --from-env-file=jenkins/env_variables.txt"
-#     - name: Deploy jenkins
-#       shell: "kubectl apply -f jenkins/jenkins_deployment.yaml"
+- name: Deploy Jenkins Instance
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Load ansible variables
+      include_vars:
+        file: env.yaml
+    - name: Log into Azure Container Registry
+      shell: "az acr login --name {{ az_registry_name }}"
+    - name: Build jenkins image
+      shell: "docker build -t {{ az_registry_name }}.azurecr.io/jenkins-whanos:latest -f jenkins/Dockerfile ."
+    - name: Push into Azure Container Registry
+      shell: "docker push {{ az_registry_name }}.azurecr.io/jenkins-whanos:latest"
+    - name: Install kubectl interface
+      shell: "az aks install-cli"
+    - name: Get credentials WhanosK8S
+      shell: "az aks get-credentials --resource-group {{ az_resource_group }} --name {{ az_cluster_name }}"
+    - name: Generate jenkins secrets
+      shell: "kubectl create secret generic jenkins-secrets --from-env-file=jenkins/env_variables.txt"
+    - name: Deploy jenkins
+      shell: "kubectl apply -f jenkins/jenkins_deployment.yaml"
     # - name: Print Jenkins's dns name
     #   shell: ""
