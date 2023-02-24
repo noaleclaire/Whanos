@@ -1,7 +1,7 @@
 FROM node:14.17.5
 SHELL [ "/bin/bash", "-c" ]
 ONBUILD WORKDIR /app
-ONBUILD RUN npm install befunge93
+ONBUILD RUN npm install -g befunge93
 ONBUILD COPY app/. .
 ONBUILD RUN echo -e "const Befunge = require('befunge93');\n\
     let befunge = new Befunge();\n\

@@ -1,2 +1,0 @@
-CASC_JENKINS_CONFIG=/jenkins/jenkinsConfig.yml
-USER_ADMIN_PASSWORD="sonahw"

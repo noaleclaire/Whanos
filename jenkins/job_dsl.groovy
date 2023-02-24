@@ -66,6 +66,7 @@ freeStyleJob('link-project') {
     parameters {
         stringParam("GITHUB_NAME", "", "Git repository url links to the Whanos infrastructure (owner/repo_name)")
         stringParam("JOB_NAME", "", "Name of the job to be created")
+        stringParam("APP_NAME", "", "Name of the app")
     }
     steps {
         dsl {
@@ -80,7 +81,7 @@ freeStyleJob('link-project') {
 						preBuildCleanup()
 					}
 					steps {
-						shell("bash /jenkins/check_language.sh")
+						shell("bash /jenkins/check_language.sh $APP_NAME")
 					}
 				}'''.stripIndent())
 		}

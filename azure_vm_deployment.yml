@@ -1,0 +1,100 @@
+- name: Deploy Jenkins and Docker on Azure VM
+  hosts: azure_vm
+  vars:
+    os_environment:
+      - key: AZ_APP_ID
+        value: "{{ az_app_id }}"
+      - key: AZ_PASSWORD
+        value: "{{ az_password }}"
+      - key: AZ_TENANT_ID
+        value: "{{ az_tenant_id }}"
+      - key: AZ_RESOURCE_GROUP
+        value: "{{ az_resource_group }}"
+      - key: AZ_REGISTRY_NAME
+        value: "{{ az_registry_name }}"
+      - key: AZ_CLUSTER_NAME
+        value: "{{ az_cluster_name }}"
+  tasks:
+    - name: Load ansible variables
+      include_vars:
+        file: env.yaml
+    - name: Add environment variables
+      become: true
+      ansible.builtin.lineinfile:
+        dest: "/etc/environment"
+        state: present
+        regexp: "^{{ item.key }}="
+        line: "{{ item.key }}={{ item.value }}"
+      with_items: "{{ os_environment }}"
+    - name: Copy Jenkins folder
+      become: true
+      copy:
+        src: ./jenkins
+        dest: /
+        owner: "{{ az_vm_admin_username }}"
+        mode: 0644
+    - name: Copy Images folder
+      become: true
+      copy:
+        src: ./images
+        dest: /
+        owner: "{{ az_vm_admin_username }}"
+        mode: 0644
+    - name: Copy k8s_app folder
+      become: true
+      copy:
+        src: ./k8s_app
+        dest: /
+        owner: "{{ az_vm_admin_username }}"
+        mode: 0644
+    - name: Give permission to check_language.sh
+      become: true
+      file:
+        path: /jenkins/check_language.sh
+        mode: '0777'
+    - name: Give permission to containerize_deploy.sh
+      become: true
+      file:
+        path: /jenkins/containerize_deploy.sh
+        mode: '0777'
+- name: Install Docker
+  hosts: azure_vm
+  become: true
+  roles:
+    - role: geerlingguy.docker
+- name: Install Java 11
+  hosts: azure_vm
+  become: true
+  roles:
+    - role: geerlingguy.java
+      become: yes
+      java_packages:
+        - openjdk-11-jdk
+- name: Install Jenkins
+  hosts: azure_vm
+  become: true
+  vars:
+    jenkins_hostname: localhost
+    jenkins_home: /var/lib/jenkins
+    jenkins_http_port: 8080
+    jenkins_admin_password: "{{ jenkins_user_admin_password }}"
+    jenkins_jar_location: /opt/jenkins-cli.jar
+    jenkins_plugins:
+      - cloudbees-folder
+      - configuration-as-code
+      - configuration-as-code-support
+      - credentials
+      - github
+      - job-dsl
+      - script-security
+      - structs
+      - role-strategy
+      - ws-cleanup
+    jenkins_plugins_install_dependencies: true
+    jenkins_plugins_state: latest
+    jenkins_java_options: "-Djenkins.install.runSetupWizard=false -Dcasc.jenkins.config=/var/lib/jenkins/casc_configs"
+    jenkins_plugin_timeout: 30
+    jenkins_casc_config_file: "./jenkins/jenkins.yaml"
+  roles:
+    - role: geerlingguy.jenkins
+    - role: mattandes.jenkins_casc
