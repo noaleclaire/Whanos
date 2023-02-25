@@ -5,32 +5,38 @@
     - name: Load ansible variables
       include_vars:
         file: env.yaml
+
     - name: Log into Azure with tenant id
       shell: "az login --tenant {{ az_ad_tenant_id }}"
       when: az_ad_tenant_id != none
     - name: Log into Azure without tenant id
       shell: "az login"
       when: az_ad_tenant_id == none
-    - name: Creation of a Resource Group
-      shell: "az group create --name {{ az_resource_group }} --location francecentral"
+
+    # - name: Creation of a Resource Group
+    #   shell: "az group create --name {{ az_resource_group }} --location francecentral"
+
     - name: Creation of a Service Principal
       shell: "az ad sp create-for-rbac --name {{ az_service_principal }} --role owner --scopes /subscriptions/$(az account show --query id -o tsv)/resourceGroups/{{ az_resource_group }} > tmp.json"
     - name: Wait for Service Principal to be fully created
       wait_for:
         timeout: 30
+
     - name: Fill env.yaml for ansible-playbook
       shell: "sed -i \"1 i az_subscription_id: $(az account show --query id -o tsv)\\naz_app_id: $(grep -oP '(?<=\"appId\": \")[^\"]*' tmp.json)\\naz_password: $(grep -oP '(?<=\"password\": \")[^\"]*' tmp.json)\\naz_tenant_id: $(grep -oP '(?<=\"tenant\": \")[^\"]*' tmp.json)\" env.yaml && rm tmp.json"
+
     - name: Logout from Azure
       shell: "az logout"
 
     - name: Reload ansible variables
       include_vars:
         file: env.yaml
+
     - name: Log into Azure with service principal
       shell: "az login --service-principal -u {{ az_app_id }} -p {{ az_password }} --tenant {{ az_tenant_id }}"
 
-    - name: Creation of an Azure Container Registry
-      shell: "az acr create --resource-group {{ az_resource_group }} --name {{ az_registry_name }} --location francecentral --sku Basic"
+    # - name: Creation of an Azure Container Registry
+    #   shell: "az acr create --resource-group {{ az_resource_group }} --name {{ az_registry_name }} --location francecentral --sku Basic"
 
     # - name: Creation of an Azure Kubernetes Service
     #   shell: "az aks create --resource-group {{ az_resource_group }} --name {{ az_cluster_name }} --location francecentral --node-count 2 --node-vm-size Standard_D2_v2 --dns-name-prefix whanos --service-principal {{ az_app_id }} --client-secret {{ az_password }} --attach-acr {{ az_registry_name }} --tags \"env=Prod\""
@@ -43,8 +49,8 @@
       shell: "az vm open-port --port 80,8080 --priority 100 --resource-group {{ az_resource_group }} --name {{ az_vm_name }}"
     - name: Install dependencies for python3 on VM
       shell: "az vm run-command invoke --resource-group {{ az_resource_group }} --name {{ az_vm_name }} --command-id RunShellScript --scripts \"sudo apt-get install -y build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev wget libbz2-dev curl gnupg\""
-    - name: Install python3 on VM
-      shell: "az vm run-command invoke --resource-group {{ az_resource_group }} --name {{ az_vm_name }} --command-id RunShellScript --scripts \"wget https://www.python.org/ftp/python/3.11.1/Python-3.11.1.tgz && tar -xvf Python-3.11.1.tgz && cd Python-3.11.1 && sudo ./configure --enable-optimizations && sudo make -j 2 && sudo make altinstall && sudo apt-get install -y python3-pip\""
+    # - name: Install python3 on VM
+    #   shell: "az vm run-command invoke --resource-group {{ az_resource_group }} --name {{ az_vm_name }} --command-id RunShellScript --scripts \"wget https://www.python.org/ftp/python/3.11.1/Python-3.11.1.tgz && tar -xvf Python-3.11.1.tgz && cd Python-3.11.1 && sudo ./configure --enable-optimizations && sudo make -j 2 && sudo make altinstall && sudo apt-get install -y python3-pip\""
     - name: Install python3 on VM
       shell: "az vm run-command invoke --resource-group {{ az_resource_group }} --name {{ az_vm_name }} --command-id RunShellScript --scripts \"sudo apt-get install -y python3 && sudo apt-get install -y python3-pip\""
     - name: Install azure-cli on VM
@@ -57,16 +63,14 @@
       register: vm_ip
     - name: Fill inventory for ansible-playbook azure_vm_deployment.yml
       shell: "echo -e \"[azure_vm]\\n{{ vm_ip.stdout_lines[0] }}\" > inventory.cfg"
-    - name: Install Ansible Galaxy Docker
-      shell: "ansible-galaxy install geerlingguy.docker"
-    - name: Install Ansible Galaxy Jenkins
-      shell: "ansible-galaxy install geerlingguy.jenkins"
-    - name: Install Ansible Galaxy Java
-      shell: "ansible-galaxy install geerlingguy.java"
-    - name: Install Ansible Galaxy Jenkins CASC
-      shell: "ansible-galaxy install mattandes.jenkins_casc"
-    - name: Create inventory.cfg
-      shell: "touch inventory.cfg"
+    # - name: Install Ansible Galaxy Docker
+    #   shell: "ansible-galaxy install geerlingguy.docker"
+    # - name: Install Ansible Galaxy Jenkins
+    #   shell: "ansible-galaxy install geerlingguy.jenkins"
+    # - name: Install Ansible Galaxy Java
+    #   shell: "ansible-galaxy install geerlingguy.java"
+    # - name: Install Ansible Galaxy Jenkins CASC
+    #   shell: "ansible-galaxy install mattandes.jenkins_casc"
     - name: Install Jenkins and Docker on VM
       shell: "ansible-playbook -i inventory.cfg azure_vm_deployment.yml --user={{ az_vm_admin_username }}"
     - name: Print ip address of the VM

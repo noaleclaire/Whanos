@@ -41,4 +41,4 @@ then
     exit 1
 fi
 
-# containerize $LANGUAGE_NAME $1
+containerize $LANGUAGE_NAME $1

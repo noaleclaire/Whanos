@@ -1,37 +1,16 @@
 - name: Deploy Jenkins and Docker on Azure VM
   hosts: azure_vm
-  vars:
-    os_environment:
-      - key: AZ_APP_ID
-        value: "{{ az_app_id }}"
-      - key: AZ_PASSWORD
-        value: "{{ az_password }}"
-      - key: AZ_TENANT_ID
-        value: "{{ az_tenant_id }}"
-      - key: AZ_RESOURCE_GROUP
-        value: "{{ az_resource_group }}"
-      - key: AZ_REGISTRY_NAME
-        value: "{{ az_registry_name }}"
-      - key: AZ_CLUSTER_NAME
-        value: "{{ az_cluster_name }}"
   tasks:
     - name: Load ansible variables
       include_vars:
         file: env.yaml
-    - name: Add environment variables
-      become: true
-      ansible.builtin.lineinfile:
-        dest: "/etc/environment"
-        state: present
-        regexp: "^{{ item.key }}="
-        line: "{{ item.key }}={{ item.value }}"
-      with_items: "{{ os_environment }}"
     - name: Copy Jenkins folder
       become: true
       copy:
         src: ./jenkins
         dest: /
         owner: "{{ az_vm_admin_username }}"
+        group: "{{ az_vm_admin_username }}"
         mode: 0644
     - name: Copy Images folder
       become: true
@@ -39,6 +18,7 @@
         src: ./images
         dest: /
         owner: "{{ az_vm_admin_username }}"
+        group: "{{ az_vm_admin_username }}"
         mode: 0644
     - name: Copy k8s_app folder
       become: true
@@ -46,17 +26,26 @@
         src: ./k8s_app
         dest: /
         owner: "{{ az_vm_admin_username }}"
+        group: "{{ az_vm_admin_username }}"
         mode: 0644
+    - name: Copy env.yaml into /jenkins folder
+      become: true
+      copy:
+        src: env.yaml
+        dest: /jenkins
+        owner: "{{ az_vm_admin_username }}"
+        group: "{{ az_vm_admin_username }}"
+        mode: 0640
     - name: Give permission to check_language.sh
       become: true
       file:
         path: /jenkins/check_language.sh
-        mode: '0777'
+        mode: '0770'
     - name: Give permission to containerize_deploy.sh
       become: true
       file:
         path: /jenkins/containerize_deploy.sh
-        mode: '0777'
+        mode: '0770'
 - name: Install Docker
   hosts: azure_vm
   become: true
@@ -98,3 +87,20 @@
   roles:
     - role: geerlingguy.jenkins
     - role: mattandes.jenkins_casc
+- name: Setup Jenkins with Docker and az_vm_admin_username
+  hosts: azure_vm
+  tasks:
+    - name: Load ansible variables
+      include_vars:
+        file: env.yaml
+    - name: Add jenkins to docker group
+      become: true
+      shell: "usermod -a -G docker jenkins"
+    - name: Add jenkins to {{ az_vm_admin_username }} group
+      become: true
+      shell: "usermod -a -G {{ az_vm_admin_username }} jenkins"
+    - name: Restart Jenkins
+      become: true
+      service:
+        name: jenkins
+        state: restarted
