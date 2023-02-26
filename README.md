@@ -12,12 +12,8 @@
     Ce projet est le projet de fin d'année en DevOps
     <br />
     <br />
-    <a href="#utilisation">Utilisation</a>
-    ·
-    <a href="#contribuer">Contribuer</a>
-    ·
     <a href="#licence">Licence</a>
-    Distrinué sous license MIT
+    Distribué sous license MIT
   </p>
 </p>
 
