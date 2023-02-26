@@ -50,8 +50,6 @@
     - name: Install dependencies for python3 on VM
       shell: "az vm run-command invoke --resource-group {{ az_resource_group }} --name {{ az_vm_name }} --command-id RunShellScript --scripts \"sudo apt-get install -y build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev wget libbz2-dev curl gnupg\""
     - name: Install python3 on VM
-      shell: "az vm run-command invoke --resource-group {{ az_resource_group }} --name {{ az_vm_name }} --command-id RunShellScript --scripts \"wget https://www.python.org/ftp/python/3.11.1/Python-3.11.1.tgz && tar -xvf Python-3.11.1.tgz && cd Python-3.11.1 && sudo ./configure --enable-optimizations && sudo make -j 2 && sudo make altinstall && sudo apt-get install -y python3-pip\""
-    - name: Install python3 on VM
       shell: "az vm run-command invoke --resource-group {{ az_resource_group }} --name {{ az_vm_name }} --command-id RunShellScript --scripts \"sudo apt-get install -y python3 && sudo apt-get install -y python3-pip\""
     - name: Install azure-cli on VM
       shell: "az vm run-command invoke --resource-group {{ az_resource_group }} --name {{ az_vm_name }} --command-id RunShellScript --scripts \"curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash\""
