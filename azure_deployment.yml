@@ -12,6 +12,8 @@
     - name: Log into Azure without tenant id
       shell: "az login"
       when: az_ad_tenant_id == none
+    - name: Register Azure Providers
+      shell: "az provider register --namespace 'Microsoft.ContainerRegistry' && az provider register --namespace 'Microsoft.Security' && az provider register --namespace 'Microsoft.ContainerService' && az provider register --namespace 'Microsoft.ManagedIdentity' && az provider register --namespace 'Microsoft.Compute' && az provider register --namespace 'Microsoft.Network' && az provider register --namespace 'Microsoft.ResourceHealth' && az provider register --namespace 'Microsoft.GuestConfiguration' && az provider register --namespace 'Microsoft.PolicyInsights' && az provider register --namespace 'Microsoft.ADHybridHealthService' && az provider register --namespace 'Microsoft.Authorization' && az provider register --namespace 'Microsoft.ClassicSubscription' && az provider register --namespace 'Microsoft.Consumption' && az provider register --namespace 'Microsoft.Portal' && az provider register --namespace 'Microsoft.Resources' && az provider register --namespace 'Microsoft.SerialConsole'"
 
     - name: Creation of a Resource Group
       shell: "az group create --name {{ az_resource_group }} --location francecentral"
@@ -37,30 +39,33 @@
 
     - name: Creation of an Azure Container Registry
       shell: "az acr create --resource-group {{ az_resource_group }} --name {{ az_registry_name }} --location francecentral --sku Basic"
+    - name: Wait for Azure Container Registry to be fully created
+      wait_for:
+        timeout: 30
 
     - name: Creation of an Azure Kubernetes Service
-      shell: "az aks create --resource-group {{ az_resource_group }} --name {{ az_cluster_name }} --location eastus --node-count 2 --node-vm-size Standard_D2_v2 --dns-name-prefix whanos --service-principal {{ az_app_id }} --client-secret {{ az_password }} --attach-acr {{ az_registry_name }} --tags \"env=Prod\""
+      shell: 'az aks create --resource-group {{ az_resource_group }} --name {{ az_cluster_name }} --location eastus --node-count 2 --node-vm-size Standard_D2_v2 --dns-name-prefix whanos --service-principal {{ az_app_id }} --client-secret {{ az_password }} --attach-acr {{ az_registry_name }} --tags "env=Prod"'
 
     - name: Creation of an Azure VM
       shell: "az vm create --resource-group {{ az_resource_group }} --name {{ az_vm_name }} --image debian --admin-username {{ az_vm_admin_username }} --generate-ssh-keys --public-ip-sku Standard --location francecentral"
     - name: Install nginx web server on VM
-      shell: "az vm run-command invoke --resource-group {{ az_resource_group }} --name {{ az_vm_name }} --command-id RunShellScript --scripts \"sudo apt-get update && sudo apt-get install -y nginx\""
+      shell: 'az vm run-command invoke --resource-group {{ az_resource_group }} --name {{ az_vm_name }} --command-id RunShellScript --scripts "sudo apt-get update && sudo apt-get install -y nginx"'
     - name: Open ports for web traffic on VM
       shell: "az vm open-port --port 80,8080 --priority 100 --resource-group {{ az_resource_group }} --name {{ az_vm_name }}"
     - name: Install dependencies for python3 on VM
-      shell: "az vm run-command invoke --resource-group {{ az_resource_group }} --name {{ az_vm_name }} --command-id RunShellScript --scripts \"sudo apt-get install -y build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev wget libbz2-dev curl gnupg\""
+      shell: 'az vm run-command invoke --resource-group {{ az_resource_group }} --name {{ az_vm_name }} --command-id RunShellScript --scripts "sudo apt-get install -y build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev wget libbz2-dev curl gnupg"'
     - name: Install python3 on VM
-      shell: "az vm run-command invoke --resource-group {{ az_resource_group }} --name {{ az_vm_name }} --command-id RunShellScript --scripts \"sudo apt-get install -y python3 && sudo apt-get install -y python3-pip\""
+      shell: 'az vm run-command invoke --resource-group {{ az_resource_group }} --name {{ az_vm_name }} --command-id RunShellScript --scripts "sudo apt-get install -y python3 && sudo apt-get install -y python3-pip"'
     - name: Install azure-cli on VM
-      shell: "az vm run-command invoke --resource-group {{ az_resource_group }} --name {{ az_vm_name }} --command-id RunShellScript --scripts \"curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash\""
+      shell: 'az vm run-command invoke --resource-group {{ az_resource_group }} --name {{ az_vm_name }} --command-id RunShellScript --scripts "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash"'
     - name: Connect to service principal on VM
-      shell: "az vm run-command invoke --resource-group {{ az_resource_group }} --name {{ az_vm_name }} --command-id RunShellScript --scripts \"az login --service-principal -u {{ az_app_id }} -p {{ az_password }} --tenant {{ az_tenant_id }}\""
+      shell: 'az vm run-command invoke --resource-group {{ az_resource_group }} --name {{ az_vm_name }} --command-id RunShellScript --scripts "az login --service-principal -u {{ az_app_id }} -p {{ az_password }} --tenant {{ az_tenant_id }}"'
     - name: Install kubectl on VM
-      shell: "az vm run-command invoke --resource-group {{ az_resource_group }} --name {{ az_vm_name }} --command-id RunShellScript --scripts \"az aks install-cli\""
+      shell: 'az vm run-command invoke --resource-group {{ az_resource_group }} --name {{ az_vm_name }} --command-id RunShellScript --scripts "az aks install-cli"'
     - name: Get Credentials of Azure Kubernetes Service on VM
-      shell: "az vm run-command invoke --resource-group {{ az_resource_group }} --name {{ az_vm_name }} --command-id RunShellScript --scripts \"az aks get-credentials --resource-group {{ az_resource_group }} --name {{ az_cluster_name }}\""
+      shell: 'az vm run-command invoke --resource-group {{ az_resource_group }} --name {{ az_vm_name }} --command-id RunShellScript --scripts "az aks get-credentials --resource-group {{ az_resource_group }} --name {{ az_cluster_name }}"'
     - name: Install Helm on VM
-      shell: "az vm run-command invoke --resource-group {{ az_resource_group }} --name {{ az_vm_name }} --command-id RunShellScript --scripts \"curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 && chmod 700 get_helm.sh && ./get_helm.sh\""
+      shell: 'az vm run-command invoke --resource-group {{ az_resource_group }} --name {{ az_vm_name }} --command-id RunShellScript --scripts "curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 && chmod 700 get_helm.sh && ./get_helm.sh"'
     - name: Wait for Azure VM to be fully created
       wait_for:
         timeout: 30
