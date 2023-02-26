@@ -5,15 +5,15 @@
 <br />
 <p align="center">
   <a href="#propos">
-    <img src="https://pbs.twimg.com/profile_images/1372956118113263619/L9-bkahs_400x400.jpg" alt="Logo" width="80" height="80">
+    <img src="https://pbs.twimg.com/profile_images/1372956118113263619/L9-bkahs_400x400.jpg" alt="Logo" width="340" height="200">
   </a>
   <h3 align="center">WHANOS</h3>
   <p align="center">
-    Ce projet est le projet de fin d'année en DevOps
+    This is our last DevOps project of Tek3 at EPITECH.
     <br />
     <br />
-    <a href="#licence">Licence</a>
-    Distribué sous license MIT
+    <a href="#license">License</a>
+    Distributed under MIT license
   </p>
 </p>
 
@@ -27,8 +27,8 @@
 
 ## Documentation
 
-ici vous pouvez avoir accès à la documentation complète du projet Whanos: https://app.gitbook.com/o/LGZrE7HOB1Ir0nuEAYn2/s/HVUvzEJcfpu9aW8Y1RRr/
+Here you can find our official Whanos documentation: https://app.gitbook.com/o/LGZrE7HOB1Ir0nuEAYn2/s/HVUvzEJcfpu9aW8Y1RRr/
 
-## Licence
+## License
 
-Distribué sous la licence MIT.
+Distributed under MIT license.
