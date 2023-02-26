@@ -27,7 +27,7 @@
 
 ## Documentation
 
-Here you can find our official Whanos documentation: https://app.gitbook.com/o/LGZrE7HOB1Ir0nuEAYn2/s/HVUvzEJcfpu9aW8Y1RRr/
+Here you can find our official Whanos documentation: https://epitech-10.gitbook.io/whanos-documentation/
 
 ## License
 
