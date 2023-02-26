@@ -21,10 +21,6 @@
   </p>
 </p>
 
-## Propos
-
-Le projet à pour objectif de [...]
-
 ### Built With
 
 * [Docker](https://www.docker.com)
@@ -33,17 +29,9 @@ Le projet à pour objectif de [...]
 * [Ansible](https://www.ansible.com)
 * [Azure](https://azure.microsoft.com/fr-fr)
 
-## Installation
+## Documentation
 
-Les étapes d'installation de votre projet, comment le configurer, comment le démarrer, etc.
-
-## Utilisation
-
-Des exemples concrets d'utilisation de votre projet, comment le faire fonctionner, comment le développer, etc.
-
-## Contribuer
-
-Des instructions sur la façon de contribuer au projet, comment faire des pull requests, comment soumettre des bugs, etc.
+ici vous pouvez avoir accès à la documentation complète du projet Whanos: https://app.gitbook.com/o/LGZrE7HOB1Ir0nuEAYn2/s/HVUvzEJcfpu9aW8Y1RRr/
 
 ## Licence
 
